@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GP LAB DLMS 4 IN / 8 OUT</title><style>
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:#0b0c0e;color:#eee;font-family:system-ui,sans-serif}
+body{display:flex;flex-direction:column}
+#top{padding:8px 10px;background:#15171b;border-bottom:2px solid #f08a2c}
+h1{margin:0 0 6px;font-size:15px;color:#f08a2c;letter-spacing:.5px}
+#mt{display:flex;gap:4px;align-items:flex-end;height:52px}
+.c{flex:1;display:flex;flex-direction:column;align-items:center;font-size:9px;color:#aaa;min-width:0}
+.c i{display:block;width:100%;height:36px;background:#23262c;border-radius:3px;position:relative;overflow:hidden}
+.c i b{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(#e33,#fc3 35%,#4d6 70%)}
+.c{cursor:pointer}.c.sel i{outline:2px solid #f08a2c}.c.sel{color:#f08a2c;font-weight:700}#hint{font-size:10px;color:#888;margin-top:5px}.g{width:8px;flex:none}
+#tb{display:flex;gap:6px;margin-top:8px}
+#tb button{flex:1;padding:9px;border:0;border-radius:8px;background:#2a2d33;color:#ddd;font-weight:700}
+#tb button.on{background:#f08a2c;color:#111}
+#pr{display:flex;gap:5px;margin-top:8px;align-items:center}#pr button{flex:1;padding:8px 0;border:0;border-radius:8px;background:#2a2d33;color:#ddd;font-weight:700}#pr button.m{flex:2;background:#1f3b24}#pr button.m.sv{background:#4a2a12}#ts{font-size:11px;color:#9d9;min-height:14px;margin-top:4px}#sp{display:none;margin-top:8px;padding:8px;background:#1b1d22;border-radius:8px;font-size:12px;gap:8px;flex-wrap:wrap}#sp.o{display:flex}#sp label{display:flex;flex-direction:column;flex:1 1 45%;gap:3px;color:#aaa}#sp select,#sp input,#sp button{padding:7px;border-radius:6px;border:0;background:#2a2d33;color:#eee;font-size:13px}#sp .w{flex:1 1 100%;color:#e9a;font-size:11px}#tt{display:flex;gap:5px;overflow-x:auto;margin-top:8px}#tt button{flex:none;padding:7px 11px;border:0;border-radius:16px;background:#2a2d33;color:#ccc;font-size:12px;font-weight:700}#tt button.on{background:#f08a2c;color:#111}#cp{display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:1 1 100%}#cp select{flex:1}#fr{flex:1;position:relative}iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#0b0c0e}
+</style></head><body>
+<div id="top"><h1>GP LAB DLMS · 4 IN / 8 OUT</h1><div id="mt"></div>
+<div id="tt"></div><div id="hint">Ketuk kanal di atas (IN A-D, O1-O8) untuk mengedit langsung</div><div id="pr"><button id="pm" class="m">PANGGIL</button><button data-p="1">P1</button><button data-p="2">P2</button><button data-p="3">P3</button><button data-p="4">P4</button><button data-p="5">P5</button></div><button id="sb" style="margin-top:8px;width:100%;padding:7px;border:0;border-radius:8px;background:#2a2d33;color:#f08a2c;font-weight:700">SETUP BERSAMA ▾</button><div id="sp"><label>Tema<select id="th"><option value=0>GP TIGER</option><option value=1>ICE LUXURY</option><option value=2>UNGU-EMAS</option><option value=3>MERAH-BIRU</option><option value=4>MERAH-PUTIH</option><option value=5>BIRU-KUNING</option><option value=6>RGB</option></select></label><label>Standby (detik, 0=mati)<input id="stb" type="number" min="0" max="600" value="30"></label><label>Master (dB)<input id="ms" type="range" min="-60" max="0" value="0"><span id="msv">0 dB</span></label><label>Generator<select id="gn"><option value=0>OFF</option><option value=1>WHITE</option><option value=2>PINK</option></select></label><label>Level generator (dB)<input id="gl" type="range" min="-60" max="0" value="-50"><span id="glv">-50 dB</span></label><label>Panel<button id="lk">KUNCI kedua unit</button></label><label style="flex:1 1 100%">Salin kanal (antar unit juga)<span id="cp"><select id="cf"></select><select id="ct"></select><button id="cb">SALIN</button></span></label><div class="w">Generator mati otomatis 30 dtk. Kecilkan volume amplifier dulu!</div></div><div id="ts"></div><div id="tb"><button id="b1" class="on">Sambung UNIT 1</button><button id="b2">Sambung UNIT 2</button></div></div>
+<div id="fr"><iframe id="f1" src="unit.html?emb=1" allow="bluetooth"></iframe><iframe id="f2" src="unit.html?u=2&emb=1" allow="bluetooth" style="visibility:hidden"></iframe></div>
+<script>
+const N=['A','B','C','D','1','2','3','4','5','6','7','8'],bars=[],mt=document.getElementById('mt');
+N.forEach((n,i)=>{if(i==4){const g=document.createElement('div');g.className='g';mt.append(g)}
+ const c=document.createElement('div');c.className='c';c.innerHTML='<i><b></b></i>'+(i<4?'IN '+n:'O'+n);mt.append(c);bars.push(c.querySelector('b'));c.onclick=()=>pick(i,c)});
+const setB=(s,k)=>{b1.classList.toggle('on',k==1);b2.classList.toggle('on',k==2);f1.style.visibility=k==1?'visible':'hidden';f2.style.visibility=k==2?'visible':'hidden';f1.style.zIndex=k==1?2:1;f2.style.zIndex=k==2?2:1};
+let cur=null;
+let selI=null,tabC='main';const CH=['IN A','IN B','IN C','IN D','OUT 1','OUT 2','OUT 3','OUT 4','OUT 5','OUT 6','OUT 7','OUT 8'];
+const info=i=>({u:(i<2||(i>=4&&i<8))?1:2,inp:i<4,n:i<4?i%2:2+(i-4)%4});
+const pfx=n=>n<2?'i'+n+'.':'o'+(n-1)+'.';
+function show(){if(selI==null)return;const q=info(selI);setB(0,q.u);let t=tabC;if(t=='main'||(q.inp&&(t=='xo'||t=='dly')))t=q.inp?'in':'out';
+ (q.u==1?f1:f2).contentWindow.postMessage({gpSel:q.n,tab:t},'*')}
+function pick(i,el){document.querySelectorAll('.c').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');selI=i;show()}
+const tt=document.getElementById('tt');[['main','Utama'],['xo','Crossover'],['peq','PEQ'],['lim','Comp/Lim'],['gate','Gate'],['dly','Delay'],['rta','RTA']].forEach(([k,n])=>{const b=document.createElement('button');b.textContent=n;if(k==tabC)b.classList.add('on');b.onclick=()=>{tabC=k;tt.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x==b));show()};tt.append(b)});
+CH.forEach((n,i)=>{cf.add(new Option('Dari '+n,i));ct.add(new Option('Ke '+n,i))});ct.value=1;
+let cid=0;cb.onclick=()=>{const a=+cf.value,t=+ct.value,A=info(a),T=info(t);if(a==t)return alert('Pilih kanal berbeda');if(A.inp!=T.inp)return alert('Salin hanya input ke input atau output ke output');
+ if(!confirm('Salin semua pengaturan '+CH[a]+' ke '+CH[t]+'? (mute dan sumber tidak ikut)'))return;const id=++cid;ts.textContent='Mengambil data '+CH[a]+'...';
+ const h=e=>{const d=e.data;if(!d||!d.gpP||d.id!=id)return;removeEventListener('message',h);const m=[];
+  Object.keys(d.o).forEach(k=>{if(/(^|\.)(mute|src)$/.test(k))return;m.push([pfx(T.n)+k,d.o[k]])});
+  if(!m.length){ts.textContent='Data kosong, sambungkan unit dulu';return}(T.u==1?f1:f2).contentWindow.postMessage({gpMany:m},'*');ts.textContent='Disalin: '+CH[a]+' ke '+CH[t]+' ('+m.length+' parameter)'};
+ addEventListener('message',h);(A.u==1?f1:f2).contentWindow.postMessage({gpGet:pfx(A.n),id:id},'*');setTimeout(()=>removeEventListener('message',h),4000)};
+b1.onclick=()=>{setB(0,1);f1.contentWindow.postMessage({gpSel:2,tab:'home'},'*')};b2.onclick=()=>{setB(0,2);f2.contentWindow.postMessage({gpSel:2,tab:'home'},'*')};setB(0,1);
+const H=(v)=>Math.min(100,Math.max(0,(v+60)/60*100))+'%';
+let sv=0,res={};const both=c=>{f1.contentWindow.postMessage({gpSet:c},'*');f2.contentWindow.postMessage({gpSet:c},'*')};
+sb.onclick=()=>sp.classList.toggle('o');th.onchange=()=>both('THEME '+th.value);stb.onchange=()=>both('STANDBY '+Math.min(600,Math.max(0,+stb.value||0)));
+ms.oninput=()=>{msv.textContent=ms.value+' dB';both('MASTER '+ms.value)};gl.oninput=()=>{glv.textContent=gl.value+' dB';both('SET genl '+gl.value)};
+gn.onchange=()=>{if(+gn.value&&!confirm('Nyalakan generator di kedua unit? Pastikan volume amplifier kecil.')){gn.value=0;return}both('SET gen '+gn.value)};
+let lkd=0;lk.onclick=()=>{lkd=!lkd;both('LOCK '+(lkd?1:0));lk.textContent=lkd?'BUKA kedua unit':'KUNCI kedua unit'};
+const ts=document.getElementById('ts');
+pm.onclick=()=>{sv=(sv+1)%3;pm.textContent=['PANGGIL','SIMPAN','NAMA'][sv];pm.classList.toggle('sv',sv>0)};
+document.querySelectorAll('#pr [data-p]').forEach(b=>b.onclick=()=>{const n=b.dataset.p;
+ if(sv==2){const t=prompt('Nama preset '+n+' (maks 12 huruf):');if(t==null)return;res={};const cmd='PRESET NAME '+n+' '+t.slice(0,12);f1.contentWindow.postMessage({gpCmd:cmd},'*');f2.contentWindow.postMessage({gpCmd:cmd},'*');b.textContent='P'+n+' '+t.slice(0,6);return}
+ if(sv==1&&!confirm('Simpan pengaturan saat ini ke Preset '+n+' di KEDUA unit?'))return;
+ res={};ts.textContent='Mengirim ke kedua unit...';const cmd='PRESET '+(sv==1?'SAVE ':'LOAD ')+n;
+ f1.contentWindow.postMessage({gpCmd:cmd},'*');f2.contentWindow.postMessage({gpCmd:cmd},'*')});
+addEventListener('message',e=>{const d=e.data;if(d&&d.gpRes){res[d.u]=d.r;if(res[1]&&res[2]){const t=x=>x=='OK'?'OK':x=='OFF'?'belum tersambung':x;ts.textContent='Unit 1: '+t(res[1])+'  |  Unit 2: '+t(res[2])}return}
+ if(!d||!d.gp||!d.m)return;const m=d.m,u=d.u;
+ bars[u==1?0:2].style.height=H(m[0]);bars[u==1?1:3].style.height=H(m[1]);
+ for(let k=0;k<4;k++)bars[(u==1?4:8)+k].style.height=H(m[2+k])});
+</script></body></html>
