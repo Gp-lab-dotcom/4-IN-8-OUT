@@ -10,15 +10,14 @@ Kontrol dua unit GP LAB DLMS Mini (IN A-D, OUT 1-8) dari satu halaman web lewat 
 
 ## Cara pakai
 1. Beri nama Bluetooth berbeda di tiap alat (mis. `GP LAB DLMS 1` dan `GP LAB DLMS 2`) dan **samakan PIN**.
-2. Tombol **Sambung UNIT 1** lalu Scan, pilih alat 1. Ulangi untuk **UNIT 2**.
-3. Ketuk kolom meter (IN A-D, O1-O8) untuk edit kanal itu langsung.
-4. P1-P5: PANGGIL / SIMPAN / NAMA preset di kedua unit sekaligus (ganti mode lewat tombol kiri).
-5. SETUP BERSAMA: tema, standby, master, generator, kunci panel untuk kedua unit.
+2. Putar HP ke mode lanskap. **CONNECT** menyambung unit 1. **SAMBUNG U2** membuka halaman sambung unit 2 (tekan Scan) di layar yang sama, tanpa pindah halaman.
+3. **MIXER**: 12 fader (IN A-D, OUT 1-8), ON/OFF, meter, CLIP. Garis oranye = unit 1, biru = unit 2.
+4. **KANAL / SINYAL / SISTEM**: satu menu untuk semua. Barisan tombol kanal memuat 12 kanal; pilih kanal mana pun (unit 1 atau 2) dan halaman PEQ, Crossover, Comp/Lim, Gate, Delay, RTA ikut berpindah ke unit yang tepat.
+5. **BERSAMA**: preset P1-P5 (panggil / simpan / nama), tema, standby, master, generator, kunci panel untuk kedua unit.
 
 ## Isi
-- `index.html` halaman gabungan 4 in 8 out
-- `unit.html` kontrol lengkap satu unit (dimuat dua kali; `?u=2` untuk unit 2)
-- `ble-shim.js` placeholder
-- `.nojekyll` agar GitHub Pages menyajikan file apa adanya
+- `index.html` aplikasi utama 4 in 8 out (unit 1 berjalan langsung di halaman ini)
+- `unit.html` mesin unit 2, dimuat tersembunyi dan ditampilkan di area konten yang sama
+- `ble-shim.js` placeholder, `.nojekyll`
 
-Baris tab (Utama, Crossover, PEQ, Comp/Lim, Gate, Delay, RTA) berlaku untuk kanal mana pun dari 12 kanal; tinggal ketuk kanal di meter. Salin kanal (di SETUP BERSAMA) bisa antar unit, input ke input atau output ke output.
+Catatan: harus dibuka lewat HTTPS / GitHub Pages (satu alamat), karena unit 2 berbagi data dengan halaman utama.

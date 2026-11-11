@@ -918,7 +918,10 @@ setInterval(()=>{if(on&&!xfer&&!pumping&&Date.now()-lastM>1500)send('METER 1')},
 var lastG=0;setInterval(()=>{if(on&&!xfer&&!pumping&&(tab=='lim'||tab=='gate')&&Date.now()-lastG>1500){send('RTA 0');send('DYN 1')}},2000);
 addEventListener('message',e=>{const d=e.data;if(d&&d.gpSel!=null){c=d.gpSel;go(d.tab)}});addEventListener('message',e=>{const d=e.data;if(!d||!d.gpCmd)return;const U2=UN2?2:1,rep=r=>parent.postMessage({gpRes:1,u:U2,r:r},'*');
  if(!on){rep('OFF');return}ask(d.gpCmd,4000).then(r=>{if(r=='OK'&&/LOAD/.test(d.gpCmd))send('DUMP');rep(r)})});addEventListener('message',e=>{const d=e.data;if(d&&d.gpSet&&on)send(d.gpSet)});const EMB=/[?&]emb=1/.test(location.search);
-if(EMB){chips=function(){};const st=document.createElement('style');st.textContent='#nv{display:none!important}';document.head.append(st)}
+let CV=-1;const VRN=['IN A','IN B','IN C','IN D','OUT 1','OUT 2','OUT 3','OUT 4','OUT 5','OUT 6','OUT 7','OUT 8'],VN=[0,1,0,1,2,3,4,5,2,3,4,5];
+if(EMB){const st=document.createElement('style');st.textContent='header,#bn{display:none!important}';document.head.append(st);
+ chips=function(m,from){const s=E('div','sg');VRN.forEach((nm,v)=>{if(from>=2&&VN[v]<2)return;const b=E('button','btn ch'+(v==CV?' on':''),nm);b.style.setProperty('--cc',CC[VN[v]]);b.onclick=()=>parent.postMessage({gpPick:v},'*');s.append(b)});m.append(s)}}
+addEventListener('message',e=>{const d=e.data;if(d&&d.gpGo){CV=d.v;c=d.n;go(d.gpGo)}});
 addEventListener('message',e=>{const d=e.data;if(!d)return;
  if(d.gpGet){const o={};Object.keys(P).forEach(k=>{if(k.startsWith(d.gpGet))o[k.slice(d.gpGet.length)]=P[k]});parent.postMessage({gpP:1,id:d.id,o:o},'*')}
- if(d.gpMany&&on)d.gpMany.forEach(a=>put(a[0],a[1]))});</script></body></html>
+ if(d.gpMany&&on)d.gpMany.forEach(a=>put(a[0],a[1]))});window.__gp={get P(){return P},get M(){return M},get on(){return on}};</script></body></html>
